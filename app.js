@@ -17,7 +17,16 @@ const escHint = document.getElementById("escHint");
 let rafId = null;
 let startedAt = 0;
 
-const scenes = ["Kaleido", "Plasma", "Tunnel"];
+const scenes = [
+  "Kaleido",
+  "Plasma",
+  "Tunnel",
+  "Aurora",
+  "Orbitals",
+  "Moire",
+  "Dots",
+  "Spirals",
+];
 let sceneIndex = 0;
 let sceneStartMs = 0;
 let transitionFrom = 0;
@@ -358,10 +367,254 @@ function renderSceneTunnel(w, h, dt, a, alpha) {
   ctx.restore();
 }
 
+function renderSceneAurora(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 10 + 170 + a.level * 70) % 360;
+  ctx.fillStyle = hsl(hueBase, 35, 6, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalCompositeOperation = "screen";
+  const bands = 7;
+  for (let i = 0; i < bands; i++) {
+    const p = i / (bands - 1);
+    const yCenter = h * (0.2 + 0.6 * p);
+    const amp = h * (0.05 + 0.06 * (1 - p)) * (0.7 + 0.6 * a.wave);
+    const freq = 0.004 + 0.005 * (1 - p);
+    const phase = dt * (0.6 + 0.4 * a.mids) + i * 1.7;
+
+    const hue = (hueBase + 70 * p + 40 * Math.sin(dt * 0.6 + i)) % 360;
+    const grad = ctx.createLinearGradient(0, yCenter - amp, 0, yCenter + amp);
+    grad.addColorStop(0, hsl((hue + 25) % 360, 70, 55, 0));
+    grad.addColorStop(0.5, hsl(hue, 75, 62, 0.14 + 0.1 * a.level));
+    grad.addColorStop(1, hsl((hue + 25) % 360, 70, 55, 0));
+
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = Math.max(1, h * (0.01 - 0.006 * p));
+    ctx.beginPath();
+    const step = Math.max(18, Math.floor(w / 70));
+    for (let x = -step; x <= w + step; x += step) {
+      const y =
+        yCenter +
+        Math.sin(x * freq + phase) * amp +
+        Math.sin(x * freq * 2.2 + phase * 1.3) * (amp * 0.18);
+      if (x <= 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // subtle vignette
+  ctx.globalCompositeOperation = "source-over";
+  const vg = ctx.createRadialGradient(
+    w * 0.5,
+    h * 0.5,
+    0,
+    w * 0.5,
+    h * 0.5,
+    Math.max(w, h) * 0.7,
+  );
+  vg.addColorStop(0, "rgba(0,0,0,0)");
+  vg.addColorStop(1, "rgba(0,0,0,0.55)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.restore();
+}
+
+function renderSceneOrbitals(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 14 + 250 + a.level * 80) % 360;
+  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+
+  const s = Math.min(w, h);
+  const count = 260;
+  ctx.globalCompositeOperation = "lighter";
+  for (let i = 0; i < count; i++) {
+    const n = noise1(i * 13.13);
+    const n2 = noise1(i * 7.77 + 4.2);
+    const rr = s * (0.08 + 0.42 * n);
+    const speed = (0.08 + 0.22 * n2) * (0.65 + 0.7 * a.level);
+    const ang = dt * speed + i * 0.13;
+    const wob = Math.sin(dt * 0.7 + i) * (s * 0.008) * (0.4 + a.wave);
+
+    const x = Math.cos(ang) * (rr + wob);
+    const y = Math.sin(ang * (0.9 + 0.25 * n2)) * (rr - wob);
+
+    const hue = (hueBase + 160 * n + 40 * Math.sin(dt * 0.4 + i * 0.02)) % 360;
+    ctx.fillStyle = hsl(hue, 72, 62, 0.05 + 0.1 * a.treble);
+    const r = Math.max(
+      1,
+      s * (0.0016 + 0.0032 * (1 - n)) * (0.7 + 0.6 * a.beat),
+    );
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // soft central glow
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.55);
+  g.addColorStop(0, hsl((hueBase + 20) % 360, 65, 55, 0.09 + 0.08 * a.level));
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, s * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+  ctx.restore();
+}
+
+function renderSceneMoire(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 12 + 40 + a.level * 90) % 360;
+  ctx.fillStyle = hsl(hueBase, 35, 6, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalCompositeOperation = "screen";
+  const lines = 140;
+  const spacing = h / lines;
+  const phase = dt * (0.9 + 0.5 * a.mids);
+  const amp = spacing * (1.6 + 2.6 * a.wave);
+
+  ctx.lineWidth = Math.max(1, Math.min(w, h) * 0.0016);
+  for (let i = -10; i < lines + 10; i++) {
+    const y0 = i * spacing;
+    const hue = (hueBase + i * 1.7 + a.treble * 70) % 360;
+    ctx.strokeStyle = hsl(hue, 62, 55, 0.04 + 0.06 * a.level);
+    ctx.beginPath();
+    const step = Math.max(18, Math.floor(w / 80));
+    for (let x = -step; x <= w + step; x += step) {
+      const yy =
+        y0 +
+        Math.sin(x * (0.01 + 0.004 * a.bass) + phase + i * 0.15) * amp +
+        Math.sin(x * (0.022 + 0.006 * a.treble) - phase * 0.9 + i * 0.07) *
+          (amp * 0.55);
+      if (x <= 0) ctx.moveTo(x, yy);
+      else ctx.lineTo(x, yy);
+    }
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+}
+
+function renderSceneDots(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 10 + 200 + a.level * 90) % 360;
+  ctx.fillStyle = hsl(hueBase, 35, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  const s = Math.min(w, h);
+  const step = Math.max(18, Math.floor(s * 0.045));
+  const r0 = Math.max(1, s * 0.002);
+  const t = dt * 0.9;
+
+  ctx.globalCompositeOperation = "screen";
+  for (let y = -step; y <= h + step; y += step) {
+    const row = Math.floor(y / step);
+    const xOff = (row % 2) * (step * 0.5);
+    for (let x = -step; x <= w + step; x += step) {
+      const xx = x + xOff;
+      const nx = (xx / w) * 2 - 1;
+      const ny = (y / h) * 2 - 1;
+      const d = Math.sqrt(nx * nx + ny * ny);
+      const wob =
+        Math.sin(t + d * 4.0 + row * 0.2 + x * 0.01) * (0.45 + 0.55 * a.wave);
+      const rr = r0 * (0.7 + 1.4 * (0.5 + 0.5 * wob)) * (0.75 + 0.55 * a.beat);
+
+      const hue = (hueBase + d * 160 + wob * 35) % 360;
+      const aa = 0.03 + 0.07 * (1 - clamp01(d)) + 0.05 * a.level;
+      ctx.fillStyle = hsl(hue, 60, 55, aa);
+      ctx.beginPath();
+      ctx.arc(xx, y, Math.max(1, rr), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalCompositeOperation = "source-over";
+
+  ctx.restore();
+}
+
+function renderSceneSpirals(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 16 + 300 + a.level * 90) % 360;
+  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+
+  const s = Math.min(w, h);
+  const arms = 5;
+  const segs = 220;
+  const spin = dt * (0.35 + 0.5 * a.treble);
+  ctx.globalCompositeOperation = "screen";
+
+  for (let arm = 0; arm < arms; arm++) {
+    const pA = arm / arms;
+    const baseAng = pA * Math.PI * 2 + spin;
+    const hue = (hueBase + 220 * pA + 30 * Math.sin(dt * 0.6 + arm)) % 360;
+    ctx.strokeStyle = hsl(hue, 68, 58, 0.07 + 0.08 * a.level);
+    ctx.lineWidth = Math.max(1, s * 0.0022);
+    ctx.beginPath();
+    for (let i = 0; i <= segs; i++) {
+      const p = i / segs;
+      const rr = s * (0.03 + p * 0.6);
+      const twist = (p * 4.2 + 0.8 * a.wave) * Math.PI * 2;
+      const ang = baseAng + twist * (0.1 + 0.12 * a.mids);
+      const x = Math.cos(ang) * rr;
+      const y = Math.sin(ang) * rr;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // small floating motes
+  const motes = 120;
+  for (let i = 0; i < motes; i++) {
+    const n = noise1(i * 9.2);
+    const ang = dt * (0.15 + 0.35 * n) + i;
+    const rr = s * (0.1 + 0.45 * noise1(i * 2.3 + 1.1));
+    const x = Math.cos(ang) * rr;
+    const y = Math.sin(ang * 0.9) * rr;
+    const hue = (hueBase + 180 * n) % 360;
+    ctx.fillStyle = hsl(hue, 60, 62, 0.04 + 0.06 * a.treble);
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(1, s * 0.0018), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+  ctx.restore();
+}
+
 function renderScene(scene, w, h, dt, a, alpha) {
   if (scene === 0) return renderSceneKaleido(w, h, dt, a, alpha);
   if (scene === 1) return renderScenePlasma(w, h, dt, a, alpha);
-  return renderSceneTunnel(w, h, dt, a, alpha);
+  if (scene === 2) return renderSceneTunnel(w, h, dt, a, alpha);
+  if (scene === 3) return renderSceneAurora(w, h, dt, a, alpha);
+  if (scene === 4) return renderSceneOrbitals(w, h, dt, a, alpha);
+  if (scene === 5) return renderSceneMoire(w, h, dt, a, alpha);
+  if (scene === 6) return renderSceneDots(w, h, dt, a, alpha);
+  return renderSceneSpirals(w, h, dt, a, alpha);
 }
 
 function draw(t) {
@@ -482,6 +735,11 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "Digit1") beginTransition(0, performance.now());
   if (e.code === "Digit2") beginTransition(1, performance.now());
   if (e.code === "Digit3") beginTransition(2, performance.now());
+  if (e.code === "Digit4") beginTransition(3, performance.now());
+  if (e.code === "Digit5") beginTransition(4, performance.now());
+  if (e.code === "Digit6") beginTransition(5, performance.now());
+  if (e.code === "Digit7") beginTransition(6, performance.now());
+  if (e.code === "Digit8") beginTransition(7, performance.now());
 });
 
 // Initial setup

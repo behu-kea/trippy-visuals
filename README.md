@@ -34,7 +34,7 @@ Keyboard:
 
 - Space = start/stop
 - N = random next visual
-- 1/2/3 = jump to a specific visual
+- 1–8 = jump to a specific visual
 
 ## Notes
 
