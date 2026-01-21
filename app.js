@@ -26,6 +26,11 @@ const scenes = [
   "Moire",
   "Dots",
   "Spirals",
+  "Waves",
+  "Particles",
+  "Grid",
+  "Petals",
+  "Nebula",
 ];
 let sceneIndex = 0;
 let sceneStartMs = 0;
@@ -167,29 +172,29 @@ function renderSceneKaleido(w, h, dt, a, alpha) {
   ctx.save();
   ctx.translate(w / 2, h / 2);
 
-  const energy = 0.3 + a.level * 1.0;
-  const spin = 0.16 + a.treble * 1.0;
-  const pulse = 0.55 + a.beat * 1.2;
+  const energy = 0.25 + a.level * 0.6;
+  const spin = 0.1 + a.treble * 0.5;
+  const pulse = 0.5 + a.beat * 0.6;
 
   const layers = 7;
-  const petals = 10 + Math.floor(a.mids * 18);
-  const baseR = Math.min(w, h) * (0.18 + 0.06 * pulse);
+  const petals = 10 + Math.floor(a.mids * 12);
+  const baseR = Math.min(w, h) * (0.18 + 0.04 * pulse);
 
   for (let L = 0; L < layers; L++) {
     const k = L / (layers - 1);
-    const ringR = baseR * (1.0 + k * (1.6 + a.level * 1.4));
+    const ringR = baseR * (1.0 + k * (1.4 + a.level * 0.9));
     const thickness =
       (Math.min(w, h) * 0.004 + k * Math.min(w, h) * 0.009) *
-      (0.6 + a.beat * 1.7);
+      (0.6 + a.beat * 0.9);
 
     ctx.save();
-    ctx.rotate(dt * spin * (0.6 + k * 1.2) * (L % 2 ? 1 : -1));
+    ctx.rotate(dt * spin * (0.5 + k * 0.7) * (L % 2 ? 1 : -1));
 
     for (let i = 0; i < petals; i++) {
       const p = i / petals;
       const ang = p * Math.PI * 2;
       const wobble =
-        Math.sin(dt * (1.2 + k * 1.8) + p * 14) * (0.1 + 0.45 * a.wave);
+        Math.sin(dt * (0.7 + k * 1.0) + p * 14) * (0.06 + 0.25 * a.wave);
       const rr = ringR * (1 + wobble * (0.14 + a.bass * 0.25));
 
       const hue = (hueBase + 120 * k + p * 180 + a.treble * 90) % 360;
@@ -223,14 +228,15 @@ function renderSceneKaleido(w, h, dt, a, alpha) {
   }
 
   const grid = 42;
-  const maxR = Math.min(w, h) * (0.52 + a.level * 0.25);
+  const maxR = Math.min(w, h) * (0.52 + a.level * 0.2);
   ctx.globalCompositeOperation = "screen";
   for (let i = 0; i < grid; i++) {
     const p = i / (grid - 1);
     const ang = p * Math.PI * 2;
-    const rr = maxR * (0.55 + 0.55 * Math.sin(dt * (0.6 + a.mids) + p * 7.0));
-    const x = Math.cos(ang + dt * 0.22) * rr;
-    const y = Math.sin(ang - dt * 0.18) * rr;
+    const rr =
+      maxR * (0.55 + 0.45 * Math.sin(dt * (0.4 + a.mids * 0.5) + p * 5.0));
+    const x = Math.cos(ang + dt * 0.14) * rr;
+    const y = Math.sin(ang - dt * 0.12) * rr;
 
     const hue = (hueBase + p * 260 + a.bass * 80) % 360;
     ctx.fillStyle = hsl(hue, 62, 52, 0.03 + 0.06 * a.level);
@@ -261,11 +267,12 @@ function renderScenePlasma(w, h, dt, a, alpha) {
   const s = Math.min(w, h);
   for (let i = 0; i < blobs; i++) {
     const p = i / blobs;
-    const ang = dt * (0.35 + 0.8 * a.mids) + p * Math.PI * 2 * 3;
-    const rad = s * (0.18 + 0.26 * p) * (0.85 + 0.35 * Math.sin(dt + p * 9));
-    const cx = w * (0.5 + 0.33 * Math.cos(ang) * (0.65 + 0.35 * a.wave));
-    const cy = h * (0.5 + 0.33 * Math.sin(ang * 0.9) * (0.65 + 0.35 * a.wave));
-    const r = s * (0.06 + 0.12 * (1 - p)) * (0.75 + 0.65 * a.beat);
+    const ang = dt * (0.22 + 0.5 * a.mids) + p * Math.PI * 2 * 3;
+    const rad =
+      s * (0.18 + 0.26 * p) * (0.88 + 0.22 * Math.sin(dt * 0.7 + p * 6));
+    const cx = w * (0.5 + 0.28 * Math.cos(ang) * (0.7 + 0.25 * a.wave));
+    const cy = h * (0.5 + 0.28 * Math.sin(ang * 0.9) * (0.7 + 0.25 * a.wave));
+    const r = s * (0.06 + 0.12 * (1 - p)) * (0.8 + 0.45 * a.beat);
 
     const hue = (hueBase + 220 * p + 70 * Math.sin(dt * 0.9 + p * 8)) % 360;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
@@ -287,10 +294,10 @@ function renderScenePlasma(w, h, dt, a, alpha) {
     const hue = (hueBase + i * 12 + a.treble * 70) % 360;
     ctx.strokeStyle = hsl(hue, 62, 52, 0.06 + 0.1 * a.level);
     ctx.beginPath();
-    const amp = (h / lines) * (0.35 + 0.9 * a.wave);
-    const f = 0.008 + 0.012 * a.mids;
+    const amp = (h / lines) * (0.28 + 0.6 * a.wave);
+    const f = 0.006 + 0.008 * a.mids;
     for (let x = 0; x <= w; x += Math.max(10, Math.floor(w / 90))) {
-      const y = y0 + Math.sin(dt * (1.5 + a.bass) + x * f + i) * amp;
+      const y = y0 + Math.sin(dt * (0.9 + a.bass * 0.6) + x * f + i) * amp;
       if (x === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -314,12 +321,12 @@ function renderSceneTunnel(w, h, dt, a, alpha) {
 
   const s = Math.min(w, h);
   const rings = 70;
-  const rot = dt * (0.4 + a.treble * 0.9);
+  const rot = dt * (0.28 + a.treble * 0.55);
   ctx.globalCompositeOperation = "screen";
 
   for (let i = 0; i < rings; i++) {
     const p = i / (rings - 1);
-    const z = (p + ((dt * (0.12 + a.level * 0.16)) % 1)) % 1;
+    const z = (p + ((dt * (0.08 + a.level * 0.1)) % 1)) % 1;
     const rr = s * (0.06 + z * 0.62);
     const thickness = (1 - z) * (s * 0.01) + 1;
     const hue = (hueBase + 200 * (1 - z) + 60 * Math.sin(dt + p * 6)) % 360;
@@ -380,9 +387,9 @@ function renderSceneAurora(w, h, dt, a, alpha) {
   for (let i = 0; i < bands; i++) {
     const p = i / (bands - 1);
     const yCenter = h * (0.2 + 0.6 * p);
-    const amp = h * (0.05 + 0.06 * (1 - p)) * (0.7 + 0.6 * a.wave);
-    const freq = 0.004 + 0.005 * (1 - p);
-    const phase = dt * (0.6 + 0.4 * a.mids) + i * 1.7;
+    const amp = h * (0.04 + 0.05 * (1 - p)) * (0.75 + 0.4 * a.wave);
+    const freq = 0.003 + 0.004 * (1 - p);
+    const phase = dt * (0.4 + 0.3 * a.mids) + i * 1.7;
 
     const hue = (hueBase + 70 * p + 40 * Math.sin(dt * 0.6 + i)) % 360;
     const grad = ctx.createLinearGradient(0, yCenter - amp, 0, yCenter + amp);
@@ -441,9 +448,9 @@ function renderSceneOrbitals(w, h, dt, a, alpha) {
     const n = noise1(i * 13.13);
     const n2 = noise1(i * 7.77 + 4.2);
     const rr = s * (0.08 + 0.42 * n);
-    const speed = (0.08 + 0.22 * n2) * (0.65 + 0.7 * a.level);
+    const speed = (0.05 + 0.14 * n2) * (0.6 + 0.5 * a.level);
     const ang = dt * speed + i * 0.13;
-    const wob = Math.sin(dt * 0.7 + i) * (s * 0.008) * (0.4 + a.wave);
+    const wob = Math.sin(dt * 0.5 + i) * (s * 0.006) * (0.35 + a.wave * 0.6);
 
     const x = Math.cos(ang) * (rr + wob);
     const y = Math.sin(ang * (0.9 + 0.25 * n2)) * (rr - wob);
@@ -484,8 +491,8 @@ function renderSceneMoire(w, h, dt, a, alpha) {
   ctx.globalCompositeOperation = "screen";
   const lines = 140;
   const spacing = h / lines;
-  const phase = dt * (0.9 + 0.5 * a.mids);
-  const amp = spacing * (1.6 + 2.6 * a.wave);
+  const phase = dt * (0.6 + 0.35 * a.mids);
+  const amp = spacing * (1.3 + 1.8 * a.wave);
 
   ctx.lineWidth = Math.max(1, Math.min(w, h) * 0.0016);
   for (let i = -10; i < lines + 10; i++) {
@@ -497,9 +504,9 @@ function renderSceneMoire(w, h, dt, a, alpha) {
     for (let x = -step; x <= w + step; x += step) {
       const yy =
         y0 +
-        Math.sin(x * (0.01 + 0.004 * a.bass) + phase + i * 0.15) * amp +
-        Math.sin(x * (0.022 + 0.006 * a.treble) - phase * 0.9 + i * 0.07) *
-          (amp * 0.55);
+        Math.sin(x * (0.007 + 0.003 * a.bass) + phase + i * 0.12) * amp +
+        Math.sin(x * (0.015 + 0.004 * a.treble) - phase * 0.8 + i * 0.06) *
+          (amp * 0.45);
       if (x <= 0) ctx.moveTo(x, yy);
       else ctx.lineTo(x, yy);
     }
@@ -521,7 +528,7 @@ function renderSceneDots(w, h, dt, a, alpha) {
   const s = Math.min(w, h);
   const step = Math.max(18, Math.floor(s * 0.045));
   const r0 = Math.max(1, s * 0.002);
-  const t = dt * 0.9;
+  const t = dt * 0.6;
 
   ctx.globalCompositeOperation = "screen";
   for (let y = -step; y <= h + step; y += step) {
@@ -563,13 +570,13 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
   const s = Math.min(w, h);
   const arms = 5;
   const segs = 220;
-  const spin = dt * (0.35 + 0.5 * a.treble);
+  const spin = dt * (0.22 + 0.32 * a.treble);
   ctx.globalCompositeOperation = "screen";
 
   for (let arm = 0; arm < arms; arm++) {
     const pA = arm / arms;
     const baseAng = pA * Math.PI * 2 + spin;
-    const hue = (hueBase + 220 * pA + 30 * Math.sin(dt * 0.6 + arm)) % 360;
+    const hue = (hueBase + 220 * pA + 25 * Math.sin(dt * 0.4 + arm)) % 360;
     ctx.strokeStyle = hsl(hue, 68, 58, 0.07 + 0.08 * a.level);
     ctx.lineWidth = Math.max(1, s * 0.0022);
     ctx.beginPath();
@@ -590,7 +597,7 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
   const motes = 120;
   for (let i = 0; i < motes; i++) {
     const n = noise1(i * 9.2);
-    const ang = dt * (0.15 + 0.35 * n) + i;
+    const ang = dt * (0.1 + 0.22 * n) + i;
     const rr = s * (0.1 + 0.45 * noise1(i * 2.3 + 1.1));
     const x = Math.cos(ang) * rr;
     const y = Math.sin(ang * 0.9) * rr;
@@ -606,6 +613,236 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
   ctx.restore();
 }
 
+function renderSceneWaves(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 12 + 80 + a.level * 80) % 360;
+  ctx.fillStyle = hsl(hueBase, 45, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalCompositeOperation = "screen";
+  const layers = 18;
+  const s = Math.min(w, h);
+
+  for (let i = 0; i < layers; i++) {
+    const p = i / (layers - 1);
+    const amp = s * (0.07 + 0.11 * (1 - p)) * (0.75 + 0.4 * a.wave);
+    const freq = 0.005 + 0.006 * p;
+    const phase = dt * (0.35 + 0.5 * a.mids) + i * 0.8;
+    const yBase = h * (0.15 + 0.7 * p);
+
+    const hue = (hueBase + 140 * p + 30 * Math.sin(dt * 0.5 + i * 0.3)) % 360;
+    ctx.strokeStyle = hsl(hue, 70, 60, 0.06 + 0.08 * a.level * (1 - p * 0.5));
+    ctx.lineWidth = Math.max(1, s * (0.004 - 0.002 * p));
+    ctx.beginPath();
+
+    const step = Math.max(14, Math.floor(w / 100));
+    for (let x = -step; x <= w + step; x += step) {
+      const y =
+        yBase +
+        Math.sin(x * freq + phase) * amp +
+        Math.sin(x * freq * 1.4 - phase * 0.7) * (amp * 0.25);
+      if (x <= 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+}
+
+function renderSceneParticles(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 8 + 280 + a.level * 90) % 360;
+  ctx.fillStyle = hsl(hueBase, 30, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  const s = Math.min(w, h);
+  const count = 800;
+  ctx.globalCompositeOperation = "screen";
+
+  for (let i = 0; i < count; i++) {
+    const n = noise1(i * 7.31 + 0.5);
+    const n2 = noise1(i * 11.92 + 3.7);
+    const angle = dt * (0.1 + 0.3 * n2) + i;
+    const dist = s * (0.08 + 0.48 * n);
+    const wobble =
+      Math.sin(dt * (0.8 + 0.7 * n) + i * 0.11) * s * 0.016 * (0.5 + a.wave);
+
+    const x = w * 0.5 + Math.cos(angle) * (dist + wobble);
+    const y =
+      h * 0.5 + Math.sin(angle * (0.85 + 0.3 * n2)) * (dist - wobble * 0.7);
+
+    const hue = (hueBase + 200 * n + 40 * Math.sin(dt * 0.6 + i * 0.05)) % 360;
+    const aa = 0.03 + 0.09 * (1 - n) * a.level + 0.04 * a.beat;
+    ctx.fillStyle = hsl(hue, 65, 58, aa);
+
+    const r = Math.max(
+      1,
+      s * (0.0012 + 0.002 * (1 - n * 0.6)) * (0.8 + 0.5 * a.treble),
+    );
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+}
+
+function renderSceneGrid(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 14 + 30 + a.level * 100) % 360;
+  ctx.fillStyle = hsl(hueBase, 35, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+
+  const s = Math.min(w, h);
+  const rows = 16;
+  const cols = 16;
+  const spacing = (s * 0.85) / Math.max(rows, cols);
+  const rot = dt * (0.08 + 0.12 * a.treble);
+
+  ctx.rotate(rot);
+  ctx.globalCompositeOperation = "screen";
+
+  for (let i = -rows / 2; i <= rows / 2; i++) {
+    for (let j = -cols / 2; j <= cols / 2; j++) {
+      const x = j * spacing;
+      const y = i * spacing;
+      const d = Math.sqrt((i * i + j * j) / (rows * rows + cols * cols));
+      const phase = dt * (0.65 + 0.4 * a.mids) + d * 6.0;
+      const scale = 0.55 + 0.45 * Math.sin(phase) * (0.75 + 0.45 * a.wave);
+      const sz = spacing * 0.38 * scale * (0.85 + 0.3 * a.beat);
+
+      const hue = (hueBase + d * 180 + i * 6 + j * 4) % 360;
+      const aa = 0.04 + 0.08 * (1 - d) * a.level;
+      ctx.strokeStyle = hsl(hue, 68, 58, aa);
+      ctx.lineWidth = Math.max(1, spacing * 0.05);
+
+      ctx.strokeRect(x - sz / 2, y - sz / 2, sz, sz);
+    }
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+  ctx.restore();
+}
+
+function renderScenePetals(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 10 + 330 + a.level * 80) % 360;
+  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+
+  const s = Math.min(w, h);
+  const rings = 6;
+  const petalsPerRing = 12;
+  ctx.globalCompositeOperation = "screen";
+
+  for (let ring = 0; ring < rings; ring++) {
+    const rp = ring / (rings - 1);
+    const rr = s * (0.08 + rp * 0.45);
+    const rot = dt * (0.16 + 0.22 * rp) * (ring % 2 ? 1 : -1);
+
+    for (let petal = 0; petal < petalsPerRing; petal++) {
+      const pp = petal / petalsPerRing;
+      const ang = pp * Math.PI * 2 + rot;
+      const petalLen =
+        rr *
+        (0.26 + 0.16 * Math.sin(dt * 0.7 + ring + petal)) *
+        (0.85 + 0.3 * a.wave);
+      const petalWidth = petalLen * (0.35 + 0.25 * a.beat);
+
+      const cx = Math.cos(ang) * rr;
+      const cy = Math.sin(ang) * rr;
+
+      const hue =
+        (hueBase + 180 * rp + 30 * pp + 20 * Math.sin(dt * 0.7)) % 360;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, petalLen);
+      grad.addColorStop(0, hsl(hue, 70, 62, 0.16 + 0.12 * a.level));
+      grad.addColorStop(0.7, hsl((hue + 20) % 360, 65, 55, 0.06));
+      grad.addColorStop(1, hsl(hue, 60, 50, 0));
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, petalLen, petalWidth, ang, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+  ctx.restore();
+}
+
+function renderSceneNebula(w, h, dt, a, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const hueBase = (dt * 6 + 220 + a.level * 60) % 360;
+  ctx.fillStyle = hsl(hueBase, 35, 4, 1);
+  ctx.fillRect(0, 0, w, h);
+
+  const s = Math.min(w, h);
+  const clouds = 120;
+  ctx.globalCompositeOperation = "screen";
+
+  for (let i = 0; i < clouds; i++) {
+    const n = noise1(i * 5.77);
+    const n2 = noise1(i * 8.12 + 2.3);
+    const phase = dt * (0.04 + 0.1 * n2) + i;
+    const drift = s * 0.14 * Math.sin(phase) * (0.65 + 0.6 * a.wave);
+
+    const cx = w * (0.25 + 0.5 * n) + drift;
+    const cy = h * (0.25 + 0.5 * n2) + drift * 0.7;
+    const rr = s * (0.04 + 0.18 * (1 - n * 0.5)) * (0.9 + 0.4 * a.beat);
+
+    const hue = (hueBase + 140 * n + 50 * Math.sin(dt * 0.4 + i * 0.1)) % 360;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+    grad.addColorStop(0, hsl(hue, 75, 60, 0.12 + 0.1 * a.level));
+    grad.addColorStop(0.4, hsl((hue + 30) % 360, 70, 55, 0.06));
+    grad.addColorStop(1, hsl(hue, 65, 45, 0));
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Add some stars
+  ctx.globalCompositeOperation = "lighter";
+  const stars = 80;
+  for (let i = 0; i < stars; i++) {
+    const n = noise1(i * 13.5 + 10.0);
+    const n2 = noise1(i * 7.8 + 5.5);
+    const x = w * n;
+    const y = h * n2;
+    const twinkle = 0.5 + 0.5 * Math.sin(dt * (1.2 + 1.8 * n) + i);
+    const hue = (hueBase + 60 * n) % 360;
+    ctx.fillStyle = hsl(hue, 60, 70, 0.04 + 0.06 * twinkle * a.treble);
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(1, s * 0.0012), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
+}
+
 function renderScene(scene, w, h, dt, a, alpha) {
   if (scene === 0) return renderSceneKaleido(w, h, dt, a, alpha);
   if (scene === 1) return renderScenePlasma(w, h, dt, a, alpha);
@@ -614,7 +851,12 @@ function renderScene(scene, w, h, dt, a, alpha) {
   if (scene === 4) return renderSceneOrbitals(w, h, dt, a, alpha);
   if (scene === 5) return renderSceneMoire(w, h, dt, a, alpha);
   if (scene === 6) return renderSceneDots(w, h, dt, a, alpha);
-  return renderSceneSpirals(w, h, dt, a, alpha);
+  if (scene === 7) return renderSceneSpirals(w, h, dt, a, alpha);
+  if (scene === 8) return renderSceneWaves(w, h, dt, a, alpha);
+  if (scene === 9) return renderSceneParticles(w, h, dt, a, alpha);
+  if (scene === 10) return renderSceneGrid(w, h, dt, a, alpha);
+  if (scene === 11) return renderScenePetals(w, h, dt, a, alpha);
+  return renderSceneNebula(w, h, dt, a, alpha);
 }
 
 function draw(t) {
@@ -740,6 +982,11 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "Digit6") beginTransition(5, performance.now());
   if (e.code === "Digit7") beginTransition(6, performance.now());
   if (e.code === "Digit8") beginTransition(7, performance.now());
+  if (e.code === "Digit9") beginTransition(8, performance.now());
+  if (e.code === "Digit0") beginTransition(9, performance.now());
+  if (e.code === "Minus") beginTransition(10, performance.now());
+  if (e.code === "Equal") beginTransition(11, performance.now());
+  if (e.code === "BracketLeft") beginTransition(12, performance.now());
 });
 
 // Initial setup
