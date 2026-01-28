@@ -166,7 +166,7 @@ function renderSceneKaleido(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 24 + a.level * 100) % 360;
-  ctx.fillStyle = hsl(hueBase, 50, 6, 1);
+  ctx.fillStyle = hsl(hueBase, 50, 15, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -198,9 +198,9 @@ function renderSceneKaleido(w, h, dt, a, alpha) {
       const rr = ringR * (1 + wobble * (0.14 + a.bass * 0.25));
 
       const hue = (hueBase + 120 * k + p * 180 + a.treble * 90) % 360;
-      const sat = 58 + a.treble * 18;
-      const light = 42 + a.level * 18;
-      const aa = 0.18 + 0.22 * (1 - k) + 0.12 * a.beat;
+      const sat = 65 + a.treble * 18;
+      const light = 55 + a.level * 20;
+      const aa = 0.35 + 0.3 * (1 - k) + 0.18 * a.beat;
 
       ctx.strokeStyle = hsl(hue, sat, light, aa);
       ctx.lineWidth = thickness;
@@ -239,7 +239,7 @@ function renderSceneKaleido(w, h, dt, a, alpha) {
     const y = Math.sin(ang - dt * 0.12) * rr;
 
     const hue = (hueBase + p * 260 + a.bass * 80) % 360;
-    ctx.fillStyle = hsl(hue, 62, 52, 0.03 + 0.06 * a.level);
+    ctx.fillStyle = hsl(hue, 70, 65, 0.12 + 0.15 * a.level);
     const r =
       (Math.min(w, h) * 0.02 + a.beat * Math.min(w, h) * 0.012) *
       (0.7 + 0.9 * Math.sin(dt + p * 11));
@@ -258,7 +258,7 @@ function renderScenePlasma(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 14 + 140 + a.level * 110) % 360;
-  ctx.fillStyle = hsl(hueBase, 50, 6, 1);
+  ctx.fillStyle = hsl(hueBase, 50, 15, 1);
   ctx.fillRect(0, 0, w, h);
 
   // soft plasma blobs
@@ -276,9 +276,9 @@ function renderScenePlasma(w, h, dt, a, alpha) {
 
     const hue = (hueBase + 220 * p + 70 * Math.sin(dt * 0.9 + p * 8)) % 360;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    g.addColorStop(0, hsl(hue, 68, 60, 0.14 + 0.14 * a.level));
-    g.addColorStop(0.6, hsl((hue + 40) % 360, 72, 54, 0.06));
-    g.addColorStop(1, hsl(hue, 75, 40, 0));
+    g.addColorStop(0, hsl(hue, 75, 70, 0.3 + 0.2 * a.level));
+    g.addColorStop(0.6, hsl((hue + 40) % 360, 78, 65, 0.15));
+    g.addColorStop(1, hsl(hue, 75, 50, 0));
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -292,7 +292,7 @@ function renderScenePlasma(w, h, dt, a, alpha) {
   for (let i = 0; i < lines; i++) {
     const y0 = (i + 0.5) * (h / lines);
     const hue = (hueBase + i * 12 + a.treble * 70) % 360;
-    ctx.strokeStyle = hsl(hue, 62, 52, 0.06 + 0.1 * a.level);
+    ctx.strokeStyle = hsl(hue, 70, 65, 0.18 + 0.2 * a.level);
     ctx.beginPath();
     const amp = (h / lines) * (0.28 + 0.6 * a.wave);
     const f = 0.006 + 0.008 * a.mids;
@@ -313,7 +313,7 @@ function renderSceneTunnel(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 18 + 320 + a.level * 110) % 360;
-  ctx.fillStyle = hsl(hueBase, 55, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 55, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -333,7 +333,7 @@ function renderSceneTunnel(w, h, dt, a, alpha) {
 
     ctx.save();
     ctx.rotate(rot + z * 2.2);
-    ctx.strokeStyle = hsl(hue, 70, 56, 0.05 + 0.18 * (1 - z));
+    ctx.strokeStyle = hsl(hue, 78, 68, 0.15 + 0.35 * (1 - z));
     ctx.lineWidth = thickness;
     const sides = 3 + Math.floor(6 * (0.5 + 0.5 * Math.sin(dt * 0.7)));
     ctx.beginPath();
@@ -361,7 +361,7 @@ function renderSceneTunnel(w, h, dt, a, alpha) {
     const x1 = x0 * (1 + len / (rr + 1));
     const y1 = y0 * (1 + len / (rr + 1));
     const hue = (hueBase + 180 * noise1(i * 4.2)) % 360;
-    ctx.strokeStyle = hsl(hue, 72, 62, 0.05 + 0.08 * a.treble);
+    ctx.strokeStyle = hsl(hue, 78, 72, 0.15 + 0.18 * a.treble);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x0, y0);
@@ -379,7 +379,7 @@ function renderSceneAurora(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 10 + 170 + a.level * 70) % 360;
-  ctx.fillStyle = hsl(hueBase, 35, 6, 1);
+  ctx.fillStyle = hsl(hueBase, 40, 15, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.globalCompositeOperation = "screen";
@@ -393,9 +393,9 @@ function renderSceneAurora(w, h, dt, a, alpha) {
 
     const hue = (hueBase + 70 * p + 40 * Math.sin(dt * 0.6 + i)) % 360;
     const grad = ctx.createLinearGradient(0, yCenter - amp, 0, yCenter + amp);
-    grad.addColorStop(0, hsl((hue + 25) % 360, 70, 55, 0));
-    grad.addColorStop(0.5, hsl(hue, 75, 62, 0.14 + 0.1 * a.level));
-    grad.addColorStop(1, hsl((hue + 25) % 360, 70, 55, 0));
+    grad.addColorStop(0, hsl((hue + 25) % 360, 78, 65, 0));
+    grad.addColorStop(0.5, hsl(hue, 80, 72, 0.32 + 0.18 * a.level));
+    grad.addColorStop(1, hsl((hue + 25) % 360, 78, 65, 0));
 
     ctx.strokeStyle = grad;
     ctx.lineWidth = Math.max(1, h * (0.01 - 0.006 * p));
@@ -423,7 +423,7 @@ function renderSceneAurora(w, h, dt, a, alpha) {
     Math.max(w, h) * 0.7,
   );
   vg.addColorStop(0, "rgba(0,0,0,0)");
-  vg.addColorStop(1, "rgba(0,0,0,0.55)");
+  vg.addColorStop(1, "rgba(0,0,0,0.25)");
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, w, h);
 
@@ -435,7 +435,7 @@ function renderSceneOrbitals(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 14 + 250 + a.level * 80) % 360;
-  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 45, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -456,7 +456,7 @@ function renderSceneOrbitals(w, h, dt, a, alpha) {
     const y = Math.sin(ang * (0.9 + 0.25 * n2)) * (rr - wob);
 
     const hue = (hueBase + 160 * n + 40 * Math.sin(dt * 0.4 + i * 0.02)) % 360;
-    ctx.fillStyle = hsl(hue, 72, 62, 0.05 + 0.1 * a.treble);
+    ctx.fillStyle = hsl(hue, 78, 72, 0.15 + 0.22 * a.treble);
     const r = Math.max(
       1,
       s * (0.0016 + 0.0032 * (1 - n)) * (0.7 + 0.6 * a.beat),
@@ -468,7 +468,7 @@ function renderSceneOrbitals(w, h, dt, a, alpha) {
 
   // soft central glow
   const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.55);
-  g.addColorStop(0, hsl((hueBase + 20) % 360, 65, 55, 0.09 + 0.08 * a.level));
+  g.addColorStop(0, hsl((hueBase + 20) % 360, 72, 68, 0.22 + 0.18 * a.level));
   g.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = g;
   ctx.beginPath();
@@ -485,7 +485,7 @@ function renderSceneMoire(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 12 + 40 + a.level * 90) % 360;
-  ctx.fillStyle = hsl(hueBase, 35, 6, 1);
+  ctx.fillStyle = hsl(hueBase, 40, 15, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.globalCompositeOperation = "screen";
@@ -498,7 +498,7 @@ function renderSceneMoire(w, h, dt, a, alpha) {
   for (let i = -10; i < lines + 10; i++) {
     const y0 = i * spacing;
     const hue = (hueBase + i * 1.7 + a.treble * 70) % 360;
-    ctx.strokeStyle = hsl(hue, 62, 55, 0.04 + 0.06 * a.level);
+    ctx.strokeStyle = hsl(hue, 70, 68, 0.14 + 0.16 * a.level);
     ctx.beginPath();
     const step = Math.max(18, Math.floor(w / 80));
     for (let x = -step; x <= w + step; x += step) {
@@ -522,7 +522,7 @@ function renderSceneDots(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 10 + 200 + a.level * 90) % 360;
-  ctx.fillStyle = hsl(hueBase, 35, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 40, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   const s = Math.min(w, h);
@@ -544,8 +544,8 @@ function renderSceneDots(w, h, dt, a, alpha) {
       const rr = r0 * (0.7 + 1.4 * (0.5 + 0.5 * wob)) * (0.75 + 0.55 * a.beat);
 
       const hue = (hueBase + d * 160 + wob * 35) % 360;
-      const aa = 0.03 + 0.07 * (1 - clamp01(d)) + 0.05 * a.level;
-      ctx.fillStyle = hsl(hue, 60, 55, aa);
+      const aa = 0.12 + 0.18 * (1 - clamp01(d)) + 0.12 * a.level;
+      ctx.fillStyle = hsl(hue, 68, 68, aa);
       ctx.beginPath();
       ctx.arc(xx, y, Math.max(1, rr), 0, Math.PI * 2);
       ctx.fill();
@@ -561,7 +561,7 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 16 + 300 + a.level * 90) % 360;
-  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 45, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -577,7 +577,7 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
     const pA = arm / arms;
     const baseAng = pA * Math.PI * 2 + spin;
     const hue = (hueBase + 220 * pA + 25 * Math.sin(dt * 0.4 + arm)) % 360;
-    ctx.strokeStyle = hsl(hue, 68, 58, 0.07 + 0.08 * a.level);
+    ctx.strokeStyle = hsl(hue, 75, 70, 0.2 + 0.18 * a.level);
     ctx.lineWidth = Math.max(1, s * 0.0022);
     ctx.beginPath();
     for (let i = 0; i <= segs; i++) {
@@ -602,7 +602,7 @@ function renderSceneSpirals(w, h, dt, a, alpha) {
     const x = Math.cos(ang) * rr;
     const y = Math.sin(ang * 0.9) * rr;
     const hue = (hueBase + 180 * n) % 360;
-    ctx.fillStyle = hsl(hue, 60, 62, 0.04 + 0.06 * a.treble);
+    ctx.fillStyle = hsl(hue, 68, 72, 0.14 + 0.16 * a.treble);
     ctx.beginPath();
     ctx.arc(x, y, Math.max(1, s * 0.0018), 0, Math.PI * 2);
     ctx.fill();
@@ -618,7 +618,7 @@ function renderSceneWaves(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 12 + 80 + a.level * 80) % 360;
-  ctx.fillStyle = hsl(hueBase, 45, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 50, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.globalCompositeOperation = "screen";
@@ -633,7 +633,7 @@ function renderSceneWaves(w, h, dt, a, alpha) {
     const yBase = h * (0.15 + 0.7 * p);
 
     const hue = (hueBase + 140 * p + 30 * Math.sin(dt * 0.5 + i * 0.3)) % 360;
-    ctx.strokeStyle = hsl(hue, 70, 60, 0.06 + 0.08 * a.level * (1 - p * 0.5));
+    ctx.strokeStyle = hsl(hue, 78, 72, 0.18 + 0.2 * a.level * (1 - p * 0.5));
     ctx.lineWidth = Math.max(1, s * (0.004 - 0.002 * p));
     ctx.beginPath();
 
@@ -658,7 +658,7 @@ function renderSceneParticles(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 8 + 280 + a.level * 90) % 360;
-  ctx.fillStyle = hsl(hueBase, 30, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 35, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   const s = Math.min(w, h);
@@ -678,8 +678,8 @@ function renderSceneParticles(w, h, dt, a, alpha) {
       h * 0.5 + Math.sin(angle * (0.85 + 0.3 * n2)) * (dist - wobble * 0.7);
 
     const hue = (hueBase + 200 * n + 40 * Math.sin(dt * 0.6 + i * 0.05)) % 360;
-    const aa = 0.03 + 0.09 * (1 - n) * a.level + 0.04 * a.beat;
-    ctx.fillStyle = hsl(hue, 65, 58, aa);
+    const aa = 0.12 + 0.22 * (1 - n) * a.level + 0.12 * a.beat;
+    ctx.fillStyle = hsl(hue, 72, 70, aa);
 
     const r = Math.max(
       1,
@@ -699,7 +699,7 @@ function renderSceneGrid(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 14 + 30 + a.level * 100) % 360;
-  ctx.fillStyle = hsl(hueBase, 35, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 40, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -724,8 +724,8 @@ function renderSceneGrid(w, h, dt, a, alpha) {
       const sz = spacing * 0.38 * scale * (0.85 + 0.3 * a.beat);
 
       const hue = (hueBase + d * 180 + i * 6 + j * 4) % 360;
-      const aa = 0.04 + 0.08 * (1 - d) * a.level;
-      ctx.strokeStyle = hsl(hue, 68, 58, aa);
+      const aa = 0.15 + 0.2 * (1 - d) * a.level;
+      ctx.strokeStyle = hsl(hue, 75, 70, aa);
       ctx.lineWidth = Math.max(1, spacing * 0.05);
 
       ctx.strokeRect(x - sz / 2, y - sz / 2, sz, sz);
@@ -742,7 +742,7 @@ function renderScenePetals(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 10 + 330 + a.level * 80) % 360;
-  ctx.fillStyle = hsl(hueBase, 40, 5, 1);
+  ctx.fillStyle = hsl(hueBase, 45, 14, 1);
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
@@ -773,9 +773,9 @@ function renderScenePetals(w, h, dt, a, alpha) {
       const hue =
         (hueBase + 180 * rp + 30 * pp + 20 * Math.sin(dt * 0.7)) % 360;
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, petalLen);
-      grad.addColorStop(0, hsl(hue, 70, 62, 0.16 + 0.12 * a.level));
-      grad.addColorStop(0.7, hsl((hue + 20) % 360, 65, 55, 0.06));
-      grad.addColorStop(1, hsl(hue, 60, 50, 0));
+      grad.addColorStop(0, hsl(hue, 78, 72, 0.35 + 0.2 * a.level));
+      grad.addColorStop(0.7, hsl((hue + 20) % 360, 72, 68, 0.18));
+      grad.addColorStop(1, hsl(hue, 68, 60, 0));
 
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -794,7 +794,7 @@ function renderSceneNebula(w, h, dt, a, alpha) {
   ctx.globalAlpha = alpha;
 
   const hueBase = (dt * 6 + 220 + a.level * 60) % 360;
-  ctx.fillStyle = hsl(hueBase, 35, 4, 1);
+  ctx.fillStyle = hsl(hueBase, 40, 13, 1);
   ctx.fillRect(0, 0, w, h);
 
   const s = Math.min(w, h);
@@ -813,9 +813,9 @@ function renderSceneNebula(w, h, dt, a, alpha) {
 
     const hue = (hueBase + 140 * n + 50 * Math.sin(dt * 0.4 + i * 0.1)) % 360;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
-    grad.addColorStop(0, hsl(hue, 75, 60, 0.12 + 0.1 * a.level));
-    grad.addColorStop(0.4, hsl((hue + 30) % 360, 70, 55, 0.06));
-    grad.addColorStop(1, hsl(hue, 65, 45, 0));
+    grad.addColorStop(0, hsl(hue, 80, 72, 0.28 + 0.18 * a.level));
+    grad.addColorStop(0.4, hsl((hue + 30) % 360, 78, 68, 0.16));
+    grad.addColorStop(1, hsl(hue, 72, 55, 0));
 
     ctx.fillStyle = grad;
     ctx.beginPath();
@@ -833,7 +833,7 @@ function renderSceneNebula(w, h, dt, a, alpha) {
     const y = h * n2;
     const twinkle = 0.5 + 0.5 * Math.sin(dt * (1.2 + 1.8 * n) + i);
     const hue = (hueBase + 60 * n) % 360;
-    ctx.fillStyle = hsl(hue, 60, 70, 0.04 + 0.06 * twinkle * a.treble);
+    ctx.fillStyle = hsl(hue, 68, 82, 0.15 + 0.18 * twinkle * a.treble);
     ctx.beginPath();
     ctx.arc(x, y, Math.max(1, s * 0.0012), 0, Math.PI * 2);
     ctx.fill();
